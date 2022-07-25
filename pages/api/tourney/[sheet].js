@@ -1,4 +1,4 @@
-import { strTimeToSecs } from "../../../public/helpers/backend"
+import { strTimeToSecs, byRoundTabulation } from "../../../public/helpers/backend"
 
 const reader = require("g-sheets-api");
 
@@ -11,16 +11,16 @@ export default async function handler(req, res) {
   };
   return new Promise(resolve => {
     reader(readerOptions, data => {
+      // Convert time to seconds
       const frmtData = data.map(player => {
         const frmtTimes = {}
         Object.keys(player).forEach(key => {
-          if (key !== "Player") {
+          if (key !== "Player")
             frmtTimes[key] = player[key].includes(":") ? strTimeToSecs(player[key]) : -1
-          }
         })
         return {name: player.Player, ...frmtTimes}
       })
-      return res.status(200).json({ success: true, data: frmtData })
+      return res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData) })
     })
   })
 }
