@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { Spinner, Tabs, Tab } from 'react-bootstrap'
 import useSWR from "swr"
 import ByRoundView from '../../components/ByRound';
+import OverallView from '../../components/Overall';
 import { fetcher } from '../../public/helpers/frontend';
 
 const TourneyPage = () => {
@@ -18,6 +19,7 @@ const TourneyPage = () => {
       <Tabs transition={false}>
         <Tab eventKey="overall" title="Overall">
           <h1 className="display-2">Overall</h1>
+          <OverallView data={data.overall} />
         </Tab>
         <Tab eventKey="round" title="By Round">
           <h1 className="display-2">By Round</h1>

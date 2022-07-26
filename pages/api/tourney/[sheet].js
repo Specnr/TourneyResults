@@ -1,4 +1,4 @@
-import { strTimeToSecs, byRoundTabulation } from "../../../public/helpers/backend"
+import { strTimeToSecs, byRoundTabulation, overallTabulation } from "../../../public/helpers/backend"
 
 const reader = require("g-sheets-api");
 
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         })
         return {name: player.Player, ...frmtTimes}
       })
-      return res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData) })
+      return res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData), overall: overallTabulation(frmtData) })
     })
   })
 }
