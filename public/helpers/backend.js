@@ -23,11 +23,20 @@ export const byRoundTabulation = (data) => {
 }
 
 const completedRuns = player => Object.values(player).reduce((t, c) => t + (c !== -1), -1)
+const hasCompletedRound = (player, round) => player[`Round ${round}`] !== -1
 const sumOfTimes = player => Object.values(player).reduce((t, c, i) => t + (i > 0 && c !== -1 ? c : 0), 0)
 
 export const overallTabulation = (data) => {
   return [...data].sort((a, b) => {
     const [compA, compB] = [completedRuns(a), completedRuns(b)]
+    if (hasCompletedRound(a, 8))
+      return -1
+    if (hasCompletedRound(b, 8))
+      return 1
+    if (hasCompletedRound(a, 7) && !hasCompletedRound(b, 7))
+      return -1
+    if (hasCompletedRound(b, 7) && !hasCompletedRound(a, 7))
+      return 1
     if (compA === compB) {
       return sumOfTimes(a) - sumOfTimes(b)
     }

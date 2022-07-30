@@ -4,7 +4,6 @@ import { secondsToVisual } from "../public/helpers/frontend"
 
 const ByRoundView = ({data}) => {
   const rounds = Object.keys(data[0]).map(key => ({label: key, value: key}))
-
   return (
     <Table className="my-4" style={{fontSize: "1.35em"}} responsive bordered hover variant="light">
       <thead>

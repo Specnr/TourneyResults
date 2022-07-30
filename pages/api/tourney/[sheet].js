@@ -15,8 +15,11 @@ export default async function handler(req, res) {
       const frmtData = data.map(player => {
         const frmtTimes = {}
         Object.keys(player).forEach(key => {
-          if (key !== "Player")
+          if (key !== "Player") {
             frmtTimes[key] = player[key].includes(":") ? strTimeToSecs(player[key]) : -1
+            if (player[key].toLowerCase() === "finish")
+              frmtTimes[key] = -2
+          }
         })
         return {name: player.Player, ...frmtTimes}
       })
