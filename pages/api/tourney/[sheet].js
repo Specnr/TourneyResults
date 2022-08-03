@@ -2,28 +2,42 @@ import { strTimeToSecs, byRoundTabulation, overallTabulation } from "../../../pu
 
 const reader = require("g-sheets-api");
 
+const getDataFromRef = async options => {
+  const frmtData = []
+  await reader(options, data => {
+    // Convert time to seconds
+    data.forEach(player => {
+      const frmtTimes = {}
+      Object.keys(player).forEach(key => {
+        if (key !== "Player") {
+          frmtTimes[key] = player[key].includes(":") ? strTimeToSecs(player[key]) : -1
+          if (player[key].toLowerCase() === "finish" || player[key].toLowerCase() === "skip")
+            frmtTimes[key] = -2
+        }
+      })
+      frmtData.push({name: player.Player, ...frmtTimes})
+    })
+  })
+  return frmtData
+}
+
 export default async function handler(req, res) {
-  const readerOptions = {
+  const readerRefOptions = {
     apiKey: process.env.SHEETS_API_KEY,
     sheetId: req.query.sheet,
     returnAllResults: false,
-    sheetName: 'Data'
+    sheetName: 'Refs'
   };
-  return new Promise(resolve => {
-    reader(readerOptions, data => {
-      // Convert time to seconds
-      const frmtData = data.map(player => {
-        const frmtTimes = {}
-        Object.keys(player).forEach(key => {
-          if (key !== "Player") {
-            frmtTimes[key] = player[key].includes(":") ? strTimeToSecs(player[key]) : -1
-            if (player[key].toLowerCase() === "finish")
-              frmtTimes[key] = -2
-          }
-        })
-        return {name: player.Player, ...frmtTimes}
-      })
-      return res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData), overall: overallTabulation(frmtData) })
-    })
+  reader(readerRefOptions, async refs => {
+    const frmtData = (await Promise.all(refs.map(async ref => {
+      const readerOptions = {
+        apiKey: process.env.SHEETS_API_KEY,
+        sheetId: req.query.sheet,
+        returnAllResults: false,
+        sheetName: `${ref.Name} Ref`
+      };
+      return getDataFromRef(readerOptions)
+    }))).reduce((prev, curr) => prev.concat(curr), [])
+    res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData), overall: overallTabulation(frmtData) })
   })
 }
