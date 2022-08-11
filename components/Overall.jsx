@@ -1,6 +1,6 @@
 import { Table } from "react-bootstrap"
 
-import { secondsToVisual } from "../public/helpers/frontend"
+import { secondsToVisual, placeToColor, ordinalSuffix } from "../public/helpers/frontend"
 
 const ByRoundView = ({data}) => {
   const rounds = Object.keys(data[0]).map(key => ({label: key, value: key}))
@@ -25,18 +25,25 @@ const ByRoundView = ({data}) => {
       </thead>
       <tbody>
           {
-            data.map((val, i) => (
-              <tr key={i}>
-                <td>{i + 1}</td>
-                {
-                  Object.values(val).map((vVal, j) => {
-                    if (j === 0)
-                      return <td key={`${i}-${j}`}>{vVal}</td>
-                    return <td key={`${i}-${j}`}>{secondsToVisual(vVal)}</td>
-                  })
-                }
-              </tr>
-            ))
+            data.map((val, idx) => {
+              const style = {
+                color: placeToColor(idx),
+                fontWeight: idx < 3 ? "bold" : "",
+                fontStyle: idx < 3 ? "italic" : ""
+              }
+              return (
+                <tr key={idx}>
+                  <td style={style}>{ordinalSuffix(idx + 1)}</td>
+                  {
+                    Object.values(val).map((vVal, j) => {
+                      if (j === 0)
+                        return <td style={style} key={`${idx}-${j}`}>{vVal}</td>
+                      return <td key={`${idx}-${j}`}>{secondsToVisual(vVal)}</td>
+                    })
+                  }
+                </tr>
+              )
+            })
           }
       </tbody>
     </Table>

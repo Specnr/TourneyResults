@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Table } from "react-bootstrap"
 import Select from "react-select"
 
-import { secondsToVisual } from "../public/helpers/frontend"
+import { secondsToVisual, placeToColor, ordinalSuffix } from "../public/helpers/frontend"
 
 const ByRoundView = ({data}) => {
   const [round, setRound] = useState("Round 1")
@@ -35,13 +35,19 @@ const ByRoundView = ({data}) => {
         </thead>
         <tbody>
           {
-            data[round].map((val, idx) => (
+            data[round].map((val, idx) => {
+              const style = {
+                color: placeToColor(idx),
+                fontWeight: idx < 3 ? "bold" : "",
+                fontStyle: idx < 3 ? "italic" : ""
+              }
+              return (
               <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>{val.name}</td>
+                <td style={style}>{ordinalSuffix(idx + 1)}</td>
+                <td style={style}>{val.name}</td>
                 <td>{secondsToVisual(val[round])}</td>
               </tr>
-            ))
+            )})
           }
         </tbody>
       </Table>
