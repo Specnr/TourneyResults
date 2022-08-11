@@ -36,7 +36,6 @@ const ByRoundView = ({data}) => {
         <tbody>
           {
             data[round].map((val, idx) => {
-              console.log(val)
               const style = {
                 color: idx < 3 && val[round] !== -1 && placeToColor(idx),
                 fontWeight: idx < 3 && val[round] !== -1 && "bold",
