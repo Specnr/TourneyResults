@@ -22,22 +22,25 @@ const getDataFromRef = async options => {
 }
 
 export default async function handler(req, res) {
-  const readerRefOptions = {
-    apiKey: process.env.SHEETS_API_KEY,
-    sheetId: req.query.sheet,
-    returnAllResults: false,
-    sheetName: 'Refs'
-  };
-  reader(readerRefOptions, async refs => {
-    const frmtData = (await Promise.all(refs.map(async ref => {
-      const readerOptions = {
-        apiKey: process.env.SHEETS_API_KEY,
-        sheetId: req.query.sheet,
-        returnAllResults: false,
-        sheetName: `${ref.Name} Ref`
-      };
-      return getDataFromRef(readerOptions)
-    }))).reduce((prev, curr) => prev.concat(curr), [])
-    res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData), overall: overallTabulation(frmtData) })
+  return new Promise((resolve, reject) => {
+    const readerRefOptions = {
+      apiKey: process.env.SHEETS_API_KEY,
+      sheetId: req.query.sheet,
+      returnAllResults: false,
+      sheetName: 'Refs'
+    };
+    reader(readerRefOptions, async refs => {
+      const frmtData = (await Promise.all(refs.map(async ref => {
+        const readerOptions = {
+          apiKey: process.env.SHEETS_API_KEY,
+          sheetId: req.query.sheet,
+          returnAllResults: false,
+          sheetName: `${ref.Name} Ref`
+        };
+        return getDataFromRef(readerOptions)
+      }))).reduce((prev, curr) => prev.concat(curr), [])
+      res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData), overall: overallTabulation(frmtData) })
+      resolve()
+    })
   })
 }
