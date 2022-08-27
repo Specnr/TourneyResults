@@ -1,18 +1,18 @@
 import { useRouter } from 'next/router'
+import { useState } from 'react';
 import { Spinner, Tabs, Tab } from 'react-bootstrap'
-import useSWR from "swr"
 import ByRoundView from '../../components/ByRound';
 import OverallView from '../../components/Overall';
-import { fetcher } from '../../public/helpers/frontend';
+const axios = require("axios")
 
 const TourneyPage = () => {
+  const [data, setData] = useState([])
   const router = useRouter()
   const { sheet } = router.query
-  const { data, error } = useSWR(sheet ? `/api/tourney/${sheet}` : null, fetcher);
+  if (!data.overall && sheet)
+    axios.get(`/api/tourney/${sheet}`).then(res => setData(res.data))
 
-  if (error) return "An error has occurred."
-  if (!data) return <Spinner animation="border" style={{minHeight: "2em", minWidth: "2em", fontSize: "2em"}} />
-  if (!data.success) return <h1>Invalid tourney :(</h1>
+  if (!data.overall) return <Spinner animation="border" style={{minHeight: "2em", minWidth: "2em", fontSize: "2em"}} />
   return (
     <div className='container mt-4'>
       <h1 className='display-1'>Top Runner Tournament</h1>

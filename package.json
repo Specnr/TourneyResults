@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.27.2",
     "bootstrap": "^5.2.0",
     "g-sheets-api": "^2.1.2",
     "next": "^12.2.3",
