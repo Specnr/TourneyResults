@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     returnAllResults: false,
     sheetName: 'Data'
   };
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     reader(readerOptions, data => {
       const values = data.map(row => (
         {
@@ -22,7 +22,8 @@ export default async function handler(req, res) {
           return -1
         return 0
       })
-      return res.status(200).json({ success: true, data: values })
+      res.status(200).json({ success: true, data: values })
+      resolve()
     })
   })
 }

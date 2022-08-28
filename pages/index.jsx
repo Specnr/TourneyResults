@@ -1,22 +1,22 @@
-import { Col, Row, Button, Spinner } from "react-bootstrap"
+import { Col, Row, Spinner } from "react-bootstrap"
+import { useState } from 'react';
 import Router from "next/router"
-import useSWR from "swr"
 import Select from "react-select"
-
-import { fetcher } from '../public/helpers/frontend';
+const axios = require("axios")
 
 const Home = () => {
-  const { data, error } = useSWR("/api/alltourneys", fetcher);
+  const [data, setData] = useState({})
 
   const doSearch = (item) => {
     if (item !== "")
       Router.push(`/tourney/${item}`)
   }
 
-  if (error) return "An error has occurred."
-  if (!data) return <Spinner animation="border" style={{minHeight: "2em", minWidth: "2em", fontSize: "2em"}} />
-  if (!data.success) return <h1>Something went wrong...</h1>
-
+  if (!data.data) {
+    axios.get('/api/alltourneys').then(res => setData(res.data))
+    return <Spinner animation="border" style={{minHeight: "2em", minWidth: "2em", fontSize: "2em"}} />
+  }
+  
   return (
     <>
       <Row style={{minHeight: "25vh"}}>

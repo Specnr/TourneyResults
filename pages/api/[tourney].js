@@ -16,6 +16,7 @@ export default async function handler(req, res) {
         return resolve()
       } else {
         res.status(200).json({success: true, sheetId: tourneyRow[0]["SheetId"]})
+        return resolve()
       }
     })
   })

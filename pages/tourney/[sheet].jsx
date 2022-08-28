@@ -6,7 +6,7 @@ import OverallView from '../../components/Overall';
 const axios = require("axios")
 
 const TourneyPage = () => {
-  const [data, setData] = useState([])
+  const [data, setData] = useState({})
   const router = useRouter()
   const { sheet } = router.query
   if (!data.overall && sheet)
