@@ -52,7 +52,7 @@ const Home = () => {
 }
 
 export const getServerSideProps = async () => {
-  const rawData = await axios.get(`${process.env.API_ENDPOINT}/api/alltourneys`)
+  const rawData = await axios.get(`${process.env.VERCEL_URL}/api/alltourneys`)
   return {
     props: { data: rawData.data }
   }
