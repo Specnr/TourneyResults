@@ -1,8 +1,9 @@
 import { Col, Row } from "react-bootstrap"
+import Router from "next/router"
 import Select from "react-select"
 const axios = require("axios")
 
-const Home = ({data}) => {
+const Home = () => {
   const doSearch = (item) => {
     if (item !== "")
       Router.push(`/tourney/${item}`)
