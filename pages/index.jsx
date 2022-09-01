@@ -1,20 +1,11 @@
-import { Col, Row, Spinner } from "react-bootstrap"
-import { useState } from 'react';
-import Router from "next/router"
+import { Col, Row } from "react-bootstrap"
 import Select from "react-select"
 const axios = require("axios")
 
-const Home = () => {
-  const [data, setData] = useState({})
-
+const Home = ({data}) => {
   const doSearch = (item) => {
     if (item !== "")
       Router.push(`/tourney/${item}`)
-  }
-
-  if (!data.data) {
-    axios.get('/api/alltourneys').then(res => setData(res.data))
-    return <Spinner animation="border" style={{minHeight: "2em", minWidth: "2em", fontSize: "2em"}} />
   }
   
   return (
@@ -57,6 +48,13 @@ const Home = () => {
       </Row>
     </>
   )
+}
+
+export const getServerSideProps = async () => {
+  const rawData = await axios.get(`${process.env.API_ENDPOINT}/api/alltourneys`)
+  return {
+    props: { data: rawData.data }
+  }
 }
 
 export default Home

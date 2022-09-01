@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     sheetName: 'Data'
   };
   return new Promise((resolve, reject) => {
-    reader(readerOptions, data => {
+    reader(readerOptions, async data => {
       const values = data.map(row => (
         {
           label: row["Tourney"],
