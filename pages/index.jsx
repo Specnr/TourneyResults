@@ -3,12 +3,11 @@ import Router from "next/router"
 import Select from "react-select"
 const axios = require("axios")
 
-const Home = () => {
+const Home = ({data}) => {
   const doSearch = (item) => {
     if (item !== "")
       Router.push(`/tourney/${item}`)
   }
-  
   return (
     <>
       <Row style={{minHeight: "25vh"}}>
