@@ -1,4 +1,4 @@
-import { strTimeToSecs, byRoundTabulation, overallTabulation } from "../../../public/helpers/backend"
+import { strTimeToSecs, byRoundTabulation, overallTabulation, readDataFromCache, writeDataFromCache } from "../../../public/helpers/backend"
 
 const reader = require("g-sheets-api");
 
@@ -22,6 +22,13 @@ const getDataFromRef = async options => {
 }
 
 export default async function handler(req, res) {
+  // If the current cache exists and is less than 30s old, use that
+  const cacheData = await readDataFromCache(req.query.sheet)
+  if (cacheData.length === 1 && (new Date()).getTime() < cacheData[0].timestamp + 30000) {
+    res.status(200).json({...cacheData[0], success: true, cache: true})
+    return
+  }
+  // Otherwise generate new data
   return new Promise((resolve, reject) => {
     const readerRefOptions = {
       apiKey: process.env.SHEETS_API_KEY,
@@ -39,7 +46,9 @@ export default async function handler(req, res) {
         };
         return getDataFromRef(readerOptions)
       }))).reduce((prev, curr) => prev.concat(curr), [])
-      res.status(200).json({ success: true, data: frmtData, byRound: byRoundTabulation(frmtData), overall: overallTabulation(frmtData) })
+      const data = { byRound: byRoundTabulation(frmtData), overall: overallTabulation(frmtData), sheetId: req.query.sheet }
+      writeDataFromCache(req.query.sheet, data)
+      res.status(200).json({...data, success: true, cache: false})
       resolve()
     })
   })
