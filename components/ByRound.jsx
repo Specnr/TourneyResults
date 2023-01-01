@@ -37,15 +37,15 @@ const ByRoundView = ({data}) => {
           {
             data[round].map((val, idx) => {
               const style = {
-                color: idx < 3 && val[round] !== -1 && placeToColor(idx),
-                fontWeight: idx < 3 && val[round] !== -1 && "bold",
-                fontStyle: idx < 3 && val[round] !== -1 && "italic"
+                color: idx < 3 && val.time !== -1 && placeToColor(idx),
+                fontWeight: idx < 3 && val.time !== -1 && "bold",
+                fontStyle: idx < 3 && val.time !== -1 && "italic"
               }
               return (
               <tr key={idx}>
                 <td style={style}>{ordinalSuffix(idx + 1)}</td>
                 <td style={style}>{val.name}</td>
-                <td>{secondsToVisual(val[round])}</td>
+                <td>{secondsToVisual(val.time)}</td>
               </tr>
             )})
           }

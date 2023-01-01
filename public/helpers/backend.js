@@ -15,8 +15,10 @@ export const byRoundTabulation = (data) => {
   if (data.length > 0) {
     Object.keys(data[0]).forEach((key, idx) => {
       if (key !== "name") {
-        roundData[key] = [...data].sort((a, b) => {
-          const [a1, b1] = [a[key], b[key]]
+        roundData[key] = data
+        .map(item => ( { name: item.name, time: item[key] } ))
+        .sort((a, b) => {
+          const [a1, b1] = [a.time, b.time]
           if (a1 === -1)
             return 1
           if (b1 === -1)
