@@ -22,7 +22,7 @@ const TourneyPage = ({data}) => {
 }
 
 export const getServerSideProps = async (context) => {
-  const host = process.env.NODE_ENV === "development" ? "http://localhost:3000" : `https://${process.env.VERCEL_URL}`
+  const host = `https://${process.env.VERCEL_URL}`
   const rawData = await axios.get(`${host}/api/tourney/${context.query.sheet}`)
   return {
     props: { data: rawData.data }
