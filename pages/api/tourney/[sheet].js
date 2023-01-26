@@ -9,7 +9,7 @@ const getDataFromRef = async options => {
     data.forEach(player => {
       const frmtTimes = {}
       Object.keys(player).forEach(key => {
-        if (key !== "Player") {
+        if (key[0] === "R") {
           frmtTimes[key] = player[key].includes(":") ? strTimeToSecs(player[key]) : -1
           if (player[key].toLowerCase() === "finish" || player[key].toLowerCase() === "skip")
             frmtTimes[key] = -2
