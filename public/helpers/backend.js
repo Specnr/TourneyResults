@@ -1,9 +1,9 @@
 import { MongoClient } from 'mongodb'
 const resultsCol = new MongoClient(process.env.MONGO_URI).db().collection('Results')
 
-export const readDataFromCache = sheetId => resultsCol.find({ sheetId }).toArray()
+export const readDataFromCache = toruneyId => resultsCol.find({ name: toruneyId }).toArray()
 
-export const writeDataFromCache = (sheetId, data) => (resultsCol.updateOne({ sheetId }, { $set: {...data, timestamp: (new Date()).getTime()} }, { upsert: true }))
+export const writeDataToCache = (sheetId, data) => (resultsCol.updateOne({ sheetId }, { $set: {...data, timestamp: (new Date()).getTime()} }, { upsert: true }))
 
 export const strTimeToSecs = (strTime) => {
   const [mins, secs] = strTime.split(":")

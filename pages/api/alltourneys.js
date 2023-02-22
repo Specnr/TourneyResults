@@ -11,8 +11,7 @@ export default async function handler(req, res) {
     reader(readerOptions, async data => {
       const values = data.map(row => (
         {
-          label: row["Tourney"],
-          value: row["SheetId"]
+          label: row["Tourney"]
         }
       ))
       values.sort((a, b) => {

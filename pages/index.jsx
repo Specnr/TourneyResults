@@ -6,7 +6,7 @@ const axios = require("axios")
 const Home = ({data}) => {
   const doSearch = (item) => {
     if (item !== "")
-      Router.push(`/tourney/${item}`)
+      Router.push(`/${item}`)
   }
   return (
     <>
@@ -42,7 +42,7 @@ const Home = ({data}) => {
             }}
             options={data.data}
             placeholder="Select a tourney..."
-            onChange={item => doSearch(item.value)}
+            onChange={item => doSearch(item.label)}
           />
         </Col>
       </Row>
@@ -51,7 +51,8 @@ const Home = ({data}) => {
 }
 
 export const getServerSideProps = async () => {
-  const rawData = await axios.get(`https://${process.env.VERCEL_URL}/api/alltourneys`)
+  const host = `https://${process.env.VERCEL_URL}`
+  const rawData = await axios.get(`${host}/api/alltourneys`)
   return {
     props: { data: rawData.data }
   }
