@@ -1,11 +1,19 @@
 export const fetcher = url => fetch(url).then((res) => res.json());
 
-export const secondsToVisual = secs => {
+export const roundsSort = (a, b) => {
+  if (a.value > b.value)
+    return 1
+  if (a.value < b.value)
+    return -1
+  return 0
+}
+
+export const secondsToVisual = (secs, isNew) => {
   if (secs === -2)
     return "Finish"
   if (secs === -1)
     return "DNF"
-  const timeDate = new Date(secs * 1000)
+  const timeDate = new Date(isNew ? secs : secs * 1000)
   const s = timeDate.getSeconds()
   return `${timeDate.getMinutes()}:${s < 10 ? `0${s}` : s}`
 }

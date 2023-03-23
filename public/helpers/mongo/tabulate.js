@@ -52,5 +52,5 @@ export const tabulateResults = async tourney => {
   const overall = overallTabulation(frmtData)
   const byRound = byRoundTabulation(frmtData)
 
-  return { byRound, overall }
+  return { byRound, overall, name: tourney }
 }

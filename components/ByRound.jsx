@@ -4,9 +4,8 @@ import Select from "react-select"
 
 import { secondsToVisual, placeToColor, ordinalSuffix } from "../public/helpers/frontend"
 
-const ByRoundView = ({data}) => {
+const ByRoundView = ({ data, rounds, isNew }) => {
   const [round, setRound] = useState("Round 1")
-  const rounds = Object.keys(data).map(key => ({label: key, value: key}))
 
   return (
     <>
@@ -45,7 +44,7 @@ const ByRoundView = ({data}) => {
               <tr key={idx}>
                 <td style={style}>{ordinalSuffix(idx + 1)}</td>
                 <td style={style}>{val.name}</td>
-                <td>{secondsToVisual(val.time)}</td>
+                <td>{secondsToVisual(val.time, isNew)}</td>
               </tr>
             )})
           }
