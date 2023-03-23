@@ -1,54 +1,89 @@
 import { MongoClient } from 'mongodb'
 const resultsCol = new MongoClient(process.env.MONGO_URI).db().collection('Results')
 
-export const readDataFromCache = toruneyId => resultsCol.find({ name: toruneyId }).toArray()
+export const readDataFromCache = name => resultsCol.findOne({ name })
 
-export const writeDataToCache = (sheetId, data) => (resultsCol.updateOne({ sheetId }, { $set: {...data, timestamp: (new Date()).getTime()} }, { upsert: true }))
+export const writeDataToCache = (name, data) => (resultsCol.updateOne({ name }, { $set: { ...data, timestamp: (new Date()).getTime() } }, { upsert: true }))
 
 export const strTimeToSecs = (strTime) => {
   const [mins, secs] = strTime.split(":")
-  return parseInt(mins)*60 + parseInt(secs)
+  return parseInt(mins) * 60 + parseInt(secs)
 }
 
-export const byRoundTabulation = (data) => {
-  const roundData = {}
-  if (data.length > 0) {
-    Object.keys(data[0]).forEach((key, idx) => {
-      if (key !== "name") {
-        roundData[key] = data
-        .map(item => ( { name: item.name, time: item[key] } ))
-        .sort((a, b) => {
-          const [a1, b1] = [a.time, b.time]
-          if (a1 === -1)
-            return 1
-          if (b1 === -1)
-            return -1
-          return a1 - b1
-        })
-      }
+const getAllCompletedRounds = data => {
+  const roundsSet = new Set()
+  data.forEach(player => {
+    Object.keys(player).forEach(key => {
+      if (key !== "name" && !roundsSet.has(key))
+        roundsSet.add(key)
     })
-  }
+  })
+  return roundsSet.toArray()
+}
+
+export const byRoundTabulation = data => {
+  const roundData = {}
+  data.forEach(player => {
+    Object.keys(player).forEach(round => {
+      if (round === "name")
+        return
+      if (!roundData.hasOwnProperty(round))
+        roundData[round] = []
+      // Could append in order using binary search so we dont need to sort later
+      // Would make it O(players * rounds * log(rounds)) instead of O(rounds * (players + log(rounds)))
+      roundData[round].push({ name: player.name, time: player[round] })
+    })
+  })
+  Object.keys(roundData).forEach(round => {
+    roundData[round]
+      .sort((a, b) => {
+        const [a1, b1] = [a.time, b.time]
+        if (a1 === -1)
+          return 1
+        if (b1 === -1)
+          return -1
+        return a1 - b1
+      })
+  })
   return roundData
 }
 
-const completedRuns = player => Object.values(player).reduce((t, c) => t + (c !== -1), -1)
-const hasCompletedRound = (player, round) => player[`Round ${round}`] !== -1
-const sumOfTimes = player => Object.values(player).reduce((t, c, i) => t + (i > 0 && c !== -1 ? c : 0), 0)
+const MAX_GF_ROUNDS = 5
+
+const completedRuns = player => Object.values(player).length - 1
+const completedFinals = player => Object.keys(player).reduce((t, c) => t + (!c.startsWith("Round")), -1)
+const hasCompletedRound = (player, round) => player.hasOwnProperty(round)
+const sumOfTimes = player => Object.values(player).reduce((t, c) => t + (Number.isInteger(c) ? c : 0), 0)
+const sumOfFinalsTimes = player => Object.keys(player).reduce((t, c) => t + (!c.startsWith("Round") && Number.isInteger(player[c]) ? player[c] : 0), 0)
 
 export const overallTabulation = (data) => {
   return [...data].sort((a, b) => {
     const [compA, compB] = [completedRuns(a), completedRuns(b)]
-    if (hasCompletedRound(a, 8))
-      return -1
-    if (hasCompletedRound(b, 8))
-      return 1
-    if (hasCompletedRound(a, 7) && !hasCompletedRound(b, 7))
-      return -1
-    if (hasCompletedRound(b, 7) && !hasCompletedRound(a, 7))
-      return 1
-    if (compA === compB) {
-      return sumOfTimes(a) - sumOfTimes(b)
+    const [compFinalsA, compFinalsB] = [completedFinals(a), completedFinals(b)]
+
+    // Prioritize finalists
+    for (let i = MAX_GF_ROUNDS; i > 0; i--) {
+      const roundTxt = `GF Round ${i}`
+      if (hasCompletedRound(a, roundTxt) && !hasCompletedRound(b, roundTxt))
+        return -1
+      if (hasCompletedRound(b, roundTxt) && !hasCompletedRound(a, roundTxt))
+        return 1
     }
+    if (hasCompletedRound(a, "SF") && !hasCompletedRound(b, "SF"))
+      return -1
+    if (hasCompletedRound(b, "SF") && !hasCompletedRound(a, "SF"))
+      return 1
+    if (hasCompletedRound(a, "QF") && !hasCompletedRound(b, "QF"))
+      return -1
+    if (hasCompletedRound(b, "QF") && !hasCompletedRound(a, "QF"))
+      return 1
+
+    if (compFinalsA === compFinalsB && compFinalsA > 0)
+      return sumOfFinalsTimes(a) - sumOfFinalsTimes(b)
+    
+    if (compA === compB)
+      return sumOfTimes(a) - sumOfTimes(b)
+
     return compB - compA
   })
 }

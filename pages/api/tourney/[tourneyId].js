@@ -1,4 +1,5 @@
-import { strTimeToSecs, readDataFromCache } from "../../../public/helpers/backend"
+import { strTimeToSecs, readDataFromCache, writeDataToCache } from "../../../public/helpers/backend"
+import { tabulateResults } from "../../../public/helpers/mongo/tabulate"
 
 const reader = require("g-sheets-api");
 
@@ -23,11 +24,17 @@ const getDataFromRef = async options => {
 
 export default async function handler(req, res) {
   // If the current cache exists and is less than 30s old, use that
-  const cacheData = await readDataFromCache(req.query.tourneyId)
-  if (cacheData.length === 1 && ((new Date()).getTime() < cacheData[0].timestamp + 30000 || cacheData.sheetId !== null)) {
-    res.status(200).json({...cacheData[0], success: true, cache: true})
+  let cacheData = await readDataFromCache(req.query.tourneyId)
+  if (!cacheData) {
+    res.status(404).json({ message: `Cannot find tournament ${req.query.tourneyId}` })
     return
   }
 
-  res.status(404).json({ message: `Cannot find tournament ${req.query.tourneyId}` })
+  let useCache = (new Date()).getTime() >= cacheData.timestamp + 30000 && !cacheData.isArchived
+  if (useCache) {
+    cacheData = await tabulateResults(req.query.tourneyId)
+    writeDataToCache(req.query.tourneyId, cacheData)
+  }
+
+  res.status(200).json({...cacheData, success: true, cache: useCache})
 }
