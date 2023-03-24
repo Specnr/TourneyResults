@@ -10,20 +10,14 @@ const roundNumberToText = round => {
   if (round > 0) {
     roundTxt = `Round ${round}`
   } else {
-    switch(round) {
-      case -1:
-        roundTxt = "QF"
-        break
-      case -2:
-        roundTxt = "SF"
-        break
-      case -3:
-        roundTxt = `GF Round ${round + 4}`
-        break
-      default:
-        round = "???"
-        break
-    }
+    if (round === -1)
+      roundTxt = "QF"
+    else if (round === -2)
+      roundTxt = "SF"
+    else if (round <= -3)
+      roundTxt = `GF Round ${Math.abs(round) - 2}`
+    else
+      roundTxt = "???"
   }
   return roundTxt
 }

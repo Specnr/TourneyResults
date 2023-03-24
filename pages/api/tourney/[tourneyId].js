@@ -30,8 +30,8 @@ export default async function handler(req, res) {
     return
   }
 
-  let useCache = (new Date()).getTime() >= cacheData.timestamp + 30000 && !cacheData.isArchived
-  if (useCache) {
+  let useCache = (new Date()).getTime() < cacheData.timestamp + 30000 || cacheData.isArchived
+  if (!useCache) {
     cacheData = await tabulateResults(req.query.tourneyId)
     writeDataToCache(req.query.tourneyId, cacheData)
   }

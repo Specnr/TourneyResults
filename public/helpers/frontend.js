@@ -1,6 +1,20 @@
 export const fetcher = url => fetch(url).then((res) => res.json());
 
+const roundPriority = ["GF", "SF", "QF"]
 export const roundsSort = (a, b) => {
+  for (const round of roundPriority) {
+    if (a.value.startsWith(round) && !b.value.startsWith(round))
+      return 1
+    if (!a.value.startsWith(round) && b.value.startsWith(round))
+      return -1
+    if (a.value.startsWith(round) && b.value.startsWith(round)) {
+      if (a.value > b.value)
+        return 1
+      if (a.value < b.value)
+        return -1
+      return 0
+    }
+  }
   if (a.value > b.value)
     return 1
   if (a.value < b.value)
