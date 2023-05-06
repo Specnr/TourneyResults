@@ -38,10 +38,13 @@ export const tabulateResults = async tourney => {
     userData[sub.uuid][round] = sub.time
   })
 
-  const frmtData = await Promise.all(Object.keys(userData).map(async uuid => ({
-    name: await uuidToUsername(uuid),
-    ...(userData[uuid])
-  })))
+  const frmtData = await Promise.all(Object.keys(userData).map(async uuid => {
+    let x = await uuidToUsername(uuid)
+    return ({
+      name: x ? (x).data.name : "error",
+      ...(userData[uuid])
+    })
+  }))
   
   const overall = overallTabulation(frmtData)
   const byRound = byRoundTabulation(frmtData)
