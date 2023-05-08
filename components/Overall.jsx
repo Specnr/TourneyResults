@@ -46,8 +46,8 @@ const ByRoundView = ({ data, rounds, isNew }) => {
                         needsRedDNF = false
                       }
                       return (
-                        <td style={player[r.value] < 0 || showRedDNF ? slowestStyle : null} key={`${i}-${j}`}>
-                          {player.hasOwnProperty(r.value) ? secondsToVisual(Math.abs(player[r.value]), isNew) : "DNF"}
+                        <td style={player[r.value] < -1 || showRedDNF ? slowestStyle : null} key={`${i}-${j}`}>
+                          {player.hasOwnProperty(r.value) && player[r.value] !== -1 ? secondsToVisual(Math.abs(player[r.value]), isNew) : "DNF"}
                         </td>
                       )
                     })
