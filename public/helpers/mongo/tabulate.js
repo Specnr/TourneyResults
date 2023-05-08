@@ -26,17 +26,32 @@ export const tabulateResults = async tourney => {
   const seeds = await seedsCol.find({}).toArray()
   const subs = await subCol.find({}).toArray()
 
-  const userData = {}
+  let userData = {}
   const seedRoundMap = {}
   seeds.forEach(seed => seedRoundMap[seed.seed] = seed.round)
 
   subs.forEach(sub => {
-    if (!userData.hasOwnProperty(sub.uuid)) {
-      userData[sub.uuid] = {}
-    }
+    if (sub.uuid === "") return
     let round = roundNumberToText(seedRoundMap[sub.seed])
+    if (round === "???") return
+
+    if (!userData.hasOwnProperty(sub.uuid)) {
+      userData[sub.uuid] = { slowest: { name: round, time: sub.time } }
+    } else {
+      if (seedRoundMap[sub.seed] > 0 && sub.time > userData[sub.uuid].slowest.time) {
+        userData[sub.uuid].slowest = { name: round, time: sub.time }
+      }
+    }
     userData[sub.uuid][round] = sub.time
   })
+
+  for (const uuid in userData) {
+    const qualsFinished = Object.keys(userData[uuid]).reduce((t, c) => t + (c.startsWith("Round")), 0)
+    if (qualsFinished === 5) {
+      userData[uuid][userData[uuid].slowest.name] *= -1
+    }
+    delete userData[uuid].slowest
+  }
 
   const frmtData = await Promise.all(Object.keys(userData).map(async uuid => {
     let x = await uuidToUsername(uuid)

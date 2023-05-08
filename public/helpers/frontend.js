@@ -39,6 +39,8 @@ export const placeToColor = place => {
     return "#929292"
   if (place === 2)
     return "#cd7f32"
+  if (place < 16)
+    return "#228B22"
 }
 
 // https://stackoverflow.com/questions/13627308/add-st-nd-rd-and-th-ordinal-suffix-to-a-number

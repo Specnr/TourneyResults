@@ -30,13 +30,27 @@ const ByRoundView = ({ data, rounds, isNew }) => {
                 fontWeight: i < 3 ? "bold" : "",
                 fontStyle: i < 3 ? "italic" : ""
               }
+              let needsRedDNF = !rounds.reduce((t, c) => c.value.startsWith("Round") ? t && player.hasOwnProperty(c.value) : t, true)
               return (
                 <tr key={i}>
                   <td style={placementStyle}>{ordinalSuffix(i + 1)}</td>
-                  <td style={placementStyle}>{player.name}</td>
+                  <td style={i < 3 ? placementStyle : null}>{player.name}</td>
                   { 
-                    rounds.map((r, j) => 
-                      <td key={`${i}-${j}`}>{player.hasOwnProperty(r.value) ? secondsToVisual(player[r.value], isNew) : "DNF"}</td>)
+                    rounds.map((r, j) => {
+                      const slowestStyle = {
+                        color: "red"
+                      }
+                      let showRedDNF = false
+                      if (needsRedDNF && !player.hasOwnProperty(r.value)) {
+                        showRedDNF = true
+                        needsRedDNF = false
+                      }
+                      return (
+                        <td style={player[r.value] < 0 || showRedDNF ? slowestStyle : null} key={`${i}-${j}`}>
+                          {player.hasOwnProperty(r.value) ? secondsToVisual(Math.abs(player[r.value]), isNew) : "DNF"}
+                        </td>
+                      )
+                    })
                   }
                 </tr>
               )

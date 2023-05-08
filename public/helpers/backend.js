@@ -52,13 +52,13 @@ const MAX_GF_ROUNDS = 5
 
 const completedRuns = player => Object.values(player).length - 1
 const completedFinals = player => Object.keys(player).reduce((t, c) => t + (!c.startsWith("Round")), -1)
+const completedRounds = player => Object.keys(player).reduce((t, c) => t + (c.startsWith("Round")), 0)
 const hasCompletedRound = (player, round) => player.hasOwnProperty(round)
-const sumOfTimes = player => Object.values(player).reduce((t, c) => t + (Number.isInteger(c) ? c : 0), 0)
+const sumOfTimes = player => Object.values(player).reduce((t, c) => t + (Number.isInteger(c) && c > 0 ? c : 0), 0)
 const sumOfFinalsTimes = player => Object.keys(player).reduce((t, c) => t + (!c.startsWith("Round") && Number.isInteger(player[c]) ? player[c] : 0), 0)
 
 export const overallTabulation = (data) => {
   return [...data].sort((a, b) => {
-    const [compA, compB] = [completedRuns(a), completedRuns(b)]
     const [compFinalsA, compFinalsB] = [completedFinals(a), completedFinals(b)]
 
     // Prioritize finalists
@@ -81,8 +81,16 @@ export const overallTabulation = (data) => {
     if (compFinalsA === compFinalsB && compFinalsA > 0)
       return sumOfFinalsTimes(a) - sumOfFinalsTimes(b)
     
+    let [compA, compB] = [completedRuns(a), completedRuns(b)]
+    let [compRoundsA, compRoundsB] = [completedRounds(a), completedRounds(b)]
+    let [sumA, sumB] = [sumOfTimes(a), sumOfTimes(b)]
+
+    // Drop lowest round if DNF, lowest time is dropped if comp = 5
+    if (compRoundsA < 5) compA += 1
+    if (compRoundsB < 5) compB += 1
+
     if (compA === compB)
-      return sumOfTimes(a) - sumOfTimes(b)
+      return sumA - sumB
 
     return compB - compA
   })
