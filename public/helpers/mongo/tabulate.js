@@ -35,9 +35,10 @@ export const tabulateResults = async tourney => {
     userData[sub.uuid][round] = sub.time
   })
 
+  const totalQuals = rounds.reduce((t, c) => t + (c.name.startsWith("Round")), 0)
   for (const uuid in userData) {
     const qualsFinished = Object.keys(userData[uuid]).reduce((t, c) => t + (c.startsWith("Round")), 0)
-    if (qualsFinished === 5) {
+    if (qualsFinished === totalQuals) {
       userData[uuid][userData[uuid].slowest.name] *= -1
     }
     delete userData[uuid].slowest
