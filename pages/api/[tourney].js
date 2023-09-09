@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     reader(readerOptions, data => {
       const tourneyRow = data.filter(row => row["Tourney"].toLowerCase() === tourney.toLowerCase())
       if (tourneyRow.length != 1) {
-        res.status(404).json({success: false})
+        res.status(404).json({ success: false })
         return resolve()
       } else {
         res.status(200).json({ success: true, sheetId: tourneyRow[0]["SheetId"] || null})

@@ -2,43 +2,33 @@ import { MongoClient } from 'mongodb'
 import { uuidToUsername } from "../minecraftAPI"
 import { overallTabulation, byRoundTabulation } from "../backend"
 
-const seedsCol = new MongoClient(process.env.MONGO_URI).db().collection('Seeds')
+const roundsCol = new MongoClient(process.env.MONGO_URI).db().collection('Rounds')
 const subCol = new MongoClient(process.env.MONGO_URI).db().collection('Submissions')
 
-const roundNumberToText = round => {
-  let roundTxt;
-  if (round > 0) {
-    roundTxt = `Round ${round}`
-  } else {
-    if (round === -1)
-      roundTxt = "QF"
-    else if (round === -2)
-      roundTxt = "SF"
-    else if (round <= -3)
-      roundTxt = `GF Round ${Math.abs(round) - 2}`
-    else
-      roundTxt = "???"
-  }
-  return roundTxt
+const roundNumberToText = (round, roundList) => {
+  const foundRound = roundList.filter(r => r.order === round);
+  if (foundRound.length === 0) return "???"
+
+  return foundRound[0].name
 }
 
 export const tabulateResults = async tourney => {
-  const seeds = await seedsCol.find({}).toArray()
+  const rounds = await roundsCol.find({}).toArray()
   const subs = await subCol.find({}).toArray()
 
   let userData = {}
   const seedRoundMap = {}
-  seeds.forEach(seed => seedRoundMap[seed.seed] = seed.round)
+  rounds.forEach(round => seedRoundMap[round.order] = round)
 
   subs.forEach(sub => {
     if (sub.uuid === "") return
-    let round = roundNumberToText(seedRoundMap[sub.seed])
+    const round = roundNumberToText(sub.round, rounds)
     if (round === "???") return
 
     if (!userData.hasOwnProperty(sub.uuid)) {
       userData[sub.uuid] = { slowest: { name: round, time: sub.time } }
     } else {
-      if (seedRoundMap[sub.seed] > 0 && sub.time > userData[sub.uuid].slowest.time) {
+      if (seedRoundMap[sub.round].name.startsWith("Round") && sub.time > userData[sub.uuid].slowest.time) {
         userData[sub.uuid].slowest = { name: round, time: sub.time }
       }
     }

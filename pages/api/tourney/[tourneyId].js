@@ -1,26 +1,5 @@
-import { strTimeToSecs, readDataFromCache, writeDataToCache } from "../../../public/helpers/backend"
+import { readDataFromCache, writeDataToCache } from "../../../public/helpers/backend"
 import { tabulateResults } from "../../../public/helpers/mongo/tabulate"
-
-const reader = require("g-sheets-api");
-
-const getDataFromRef = async options => {
-  const frmtData = []
-  await reader(options, data => {
-    // Convert time to seconds
-    data.forEach(player => {
-      const frmtTimes = {}
-      Object.keys(player).forEach(key => {
-        if (key[0] === "R") {
-          frmtTimes[key] = player[key].includes(":") ? strTimeToSecs(player[key]) : -1
-          if (player[key].toLowerCase() === "finish" || player[key].toLowerCase() === "skip")
-            frmtTimes[key] = -2
-        }
-      })
-      frmtData.push({name: player.Player, ...frmtTimes})
-    })
-  })
-  return frmtData
-}
 
 export default async function handler(req, res) {
   // If the current cache exists and is less than 30s old, use that
