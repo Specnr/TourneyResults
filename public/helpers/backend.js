@@ -48,7 +48,8 @@ export const byRoundTabulation = data => {
   return roundData
 }
 
-const MAX_GF_ROUNDS = 5
+const MAX_GF_ROUNDS = 3
+const MAX_F_ROUNDS = 2
 
 const completedRuns = player => Object.values(player).length - 1
 const completedFinals = player => Object.keys(player).reduce((t, c) => t + (!c.startsWith("Round")), -1)
@@ -61,7 +62,7 @@ export const overallTabulation = (data) => {
   return [...data].sort((a, b) => {
     const [compFinalsA, compFinalsB] = [completedFinals(a), completedFinals(b)]
 
-    // Prioritize finalists
+    // Prioritize grand finalists
     for (let i = MAX_GF_ROUNDS; i > 0; i--) {
       const roundTxt = `GF Round ${i}`
       if (hasCompletedRound(a, roundTxt) && !hasCompletedRound(b, roundTxt))
@@ -69,13 +70,29 @@ export const overallTabulation = (data) => {
       if (hasCompletedRound(b, roundTxt) && !hasCompletedRound(a, roundTxt))
         return 1
     }
-    if (hasCompletedRound(a, "SF") && !hasCompletedRound(b, "SF"))
+
+    // Prioritize finalists
+    for (let i = MAX_F_ROUNDS; i > 0; i--) {
+      const roundTxt = `F Round ${i}`
+      if (hasCompletedRound(a, roundTxt) && !hasCompletedRound(b, roundTxt))
+        return -1
+      if (hasCompletedRound(b, roundTxt) && !hasCompletedRound(a, roundTxt))
+        return 1
+    }
+
+    if (hasCompletedRound(a, "T8") && !hasCompletedRound(b, "T8"))
       return -1
-    if (hasCompletedRound(b, "SF") && !hasCompletedRound(a, "SF"))
+    if (hasCompletedRound(b, "T8") && !hasCompletedRound(a, "T8"))
       return 1
-    if (hasCompletedRound(a, "QF") && !hasCompletedRound(b, "QF"))
+
+    if (hasCompletedRound(a, "T16") && !hasCompletedRound(b, "T16"))
       return -1
-    if (hasCompletedRound(b, "QF") && !hasCompletedRound(a, "QF"))
+    if (hasCompletedRound(b, "T16") && !hasCompletedRound(a, "T16"))
+      return 1
+
+    if (hasCompletedRound(a, "T32") && !hasCompletedRound(b, "T32"))
+      return -1
+    if (hasCompletedRound(b, "T32") && !hasCompletedRound(a, "T32"))
       return 1
 
     if (compFinalsA === compFinalsB && compFinalsA > 0)

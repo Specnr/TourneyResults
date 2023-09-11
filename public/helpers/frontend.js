@@ -1,6 +1,6 @@
 export const fetcher = url => fetch(url).then((res) => res.json());
 
-const roundPriority = ["GF", "SF", "QF"]
+const roundPriority = ["GF", "F", "T8", "SF", "T16", "QF", "T32", "TQ"]
 export const roundsSort = (a, b) => {
   for (const round of roundPriority) {
     if (a.value.startsWith(round) && !b.value.startsWith(round))
@@ -39,7 +39,7 @@ export const placeToColor = place => {
     return "#929292"
   if (place === 2)
     return "#cd7f32"
-  if (place < 16)
+  if (place < 32)
     return "#228B22"
 }
 

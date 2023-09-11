@@ -9,7 +9,7 @@ export const createResult = async tourney => {
   for (let i=1; i<quals+1; i++)
     rounds[`Round ${i}`] = []
   return resultsCol.insertOne({
-    byRound: {...rounds, "QF": [], "SF": [], "GF": []},
+    byRound: {...rounds, "T32": [], "T16": [], "T8": [], "F": [], "GF": []},
     overall: [],
     name: tourney,
     timestamp: (new Date()).getTime(),
