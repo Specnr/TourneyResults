@@ -31,7 +31,7 @@ export const byRoundTabulation = data => {
         roundData[round] = []
       // Could append in order using binary search so we dont need to sort later
       // Would make it O(players * rounds * log(rounds)) instead of O(rounds * (players + log(rounds)))
-      roundData[round].push({ name: player.name, time: player[round] })
+      roundData[round].push({ name: player.name, time: Math.abs(player[round]) })
     })
   })
   Object.keys(roundData).forEach(round => {
