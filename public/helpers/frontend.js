@@ -47,10 +47,20 @@ export const placeToColor = place => {
 export const ordinalSuffix = i => {
   const j = i % 10, k = i % 100
   if (j === 1 && k !== 11)
-      return i + "st"
+    return i + "st"
   if (j === 2 && k !== 12)
-      return i + "nd"
+    return i + "nd"
   if (j === 3 && k !== 13)
-      return i + "rd"
+    return i + "rd"
   return i + "th"
+}
+
+export const shortenRoundName = name => {
+  if (name.startsWith("T"))
+    return name
+
+  if (name.startsWith("GF"))
+    return `GF${name.substr(name.length - 1)}`
+
+  return `${name.substr(0, 1)}${name.substr(name.length - 1)}`
 }

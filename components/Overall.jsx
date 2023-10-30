@@ -1,6 +1,6 @@
 import { Table } from "react-bootstrap"
 
-import { secondsToVisual, placeToColor, ordinalSuffix } from "../public/helpers/frontend"
+import { secondsToVisual, placeToColor, ordinalSuffix, shortenRoundName } from "../public/helpers/frontend"
 
 const ByRoundView = ({ data, rounds, isNew }) => {
   return (
@@ -14,7 +14,7 @@ const ByRoundView = ({ data, rounds, isNew }) => {
               if (r.label !== "name") {
                 return (
                   <th key={i}>
-                    {r.label}
+                    {shortenRoundName(r.label)}
                   </th>
                 )
               }
