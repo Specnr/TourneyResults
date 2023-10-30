@@ -11,14 +11,15 @@ export default async function handler(req, res) {
     reader(readerOptions, async data => {
       const values = data.map(row => (
         {
-          label: row["Tourney"]
+          label: row["Tourney"],
+          order: row["Order"]
         }
       ))
       values.sort((a, b) => {
-        if (a.label > b.label)
-          return 1
-        if (a.label < b.label)
+        if (a.order > b.order)
           return -1
+        if (a.order < b.order)
+          return 1
         return 0
       })
       res.status(200).json({ success: true, data: values })
